@@ -19,7 +19,7 @@ import com.klef.sdp.service.BookingService;
 import jakarta.validation.Valid;
 
 @RestController 
-@RequestMapping("/api/bookings")
+@RequestMapping("/bookings")
 public class BookingController {
     
     @Autowired 
