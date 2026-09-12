@@ -166,6 +166,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional 
     public BookingResponse cancelBooking(int bookingId) {
         Booking booking = bookingrepo.findById(bookingId)
             .orElseThrow(() -> 
@@ -182,6 +183,17 @@ public class BookingServiceImpl implements BookingService {
         int seats = booking.getSeatsBooked();
 
         if (booking.getBookingStatus() == BookingStatus.HELD) {
+            SeatHold seatHold = seatholdrepo
+                .findByBookingIdAndHoldStatus(
+                    bookingId,
+                    HoldStatus.ACTIVE
+                )
+                .orElseThrow(() ->
+                new RuntimeException("Active seat hold not found"));
+
+            seatHold.setHoldStatus(HoldStatus.RELEASED);
+            seatholdrepo.save(seatHold);
+
             inventory.setHeldSeats(inventory.getHeldSeats() - seats);
         } else if (booking.getBookingStatus() == BookingStatus.CONFIRMED) {
             inventory.setBookedSeats(inventory.getBookedSeats() - seats);
